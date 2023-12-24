@@ -26,6 +26,7 @@ class AlgoritmoGenetico:
                 taxa_crossover: float,
                 taxa_mutacao: float,
                 args: list = []
+                mostrar_iteracoes = False
                 ):
 
         self.funcao = funcao
@@ -36,6 +37,8 @@ class AlgoritmoGenetico:
         self.num_geracoes = num_geracoes
         self.taxa_crossover = taxa_crossover
         self.taxa_mutacao = taxa_mutacao
+
+        self.mostrar_iteracoes = mostrar_iteracoes
 
         self.xmin = np.array(xlim)[:, 0]
         self.xmax = np.array(xlim)[:, 1]
@@ -50,7 +53,9 @@ class AlgoritmoGenetico:
         t = 1
 
         while (t <= self.num_geracoes):
-
+            
+            if (self.mostrar_iteracoes):
+                print(f"Geração {t}")
 
             populacao = self._selecionar(populacao, avaliacao)
 
@@ -112,6 +117,9 @@ class AlgoritmoGenetico:
         peso = 0.5
 
         val_funcao = self._aplicacao_funcao(populacao)
+        
+        if (self.mostrar_iteracoes):
+            print(f"Menor valor: {np.min(val_funcao)}")
 
         avaliacao = np.array([sum(1 for y in val_funcao if y <= x) for x in val_funcao])
 
