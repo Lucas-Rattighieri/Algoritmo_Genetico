@@ -1,3 +1,5 @@
+import numpy as np
+
 class AlgoritmoGenetico:
     """
     Classe para implementação de um Algoritmo Genético para otimização de funções.
