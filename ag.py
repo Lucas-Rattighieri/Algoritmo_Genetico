@@ -147,7 +147,7 @@ class AlgoritmoGenetico:
 
 
         indices = [i + (-1)**i for i in range(self.num_populacao)]
-        print(indices)
+        
         populacao1 = populacao[indices]
 
         indices_corte = [i - i % 2 for i in range(self.num_populacao)]
