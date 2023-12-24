@@ -25,7 +25,7 @@ class AlgoritmoGenetico:
                 num_geracoes: int,
                 taxa_crossover: float,
                 taxa_mutacao: float,
-                args: list = []
+                args: list = [],
                 mostrar_iteracoes = False
                 ):
 
