@@ -46,6 +46,8 @@ class AlgoritmoGenetico:
 
         self.xmin = np.array(xlim)[:, 0]
         self.xmax = np.array(xlim)[:, 1]
+        self.melhor_parametro = None
+        self.aptidao_melhor_parametro = None
 
 
     def run(self):
@@ -114,7 +116,21 @@ class AlgoritmoGenetico:
 
         val_funcao = np.apply_along_axis(self.funcao, 1, parametros, *self.args)
 
+        self._atualizar_melhor_parametro(parametros, val_funcao)
+
         return val_funcao
+
+    def _atualizar_melhor_parametro(self, parametros, val_funcao):
+        m_parametro = parametros[np.argmin(val_funcao)]
+        aptidao = np.min(val_funcao)
+
+        if self.aptidao_melhor_parametro is None:
+            self.melhor_parametro = m_parametro
+            self.aptidao_melhor_parametro = aptidao
+
+        elif self.aptidao_melhor_parametro > aptidao:
+            self.melhor_parametro = m_parametro
+            self.aptidao_melhor_parametro = aptidao
 
 
     def _avaliar(self, populacao):
@@ -122,7 +138,7 @@ class AlgoritmoGenetico:
         val_funcao = self._aplicacao_funcao(populacao)
         
         if (self.mostrar_iteracoes):
-            print(f"Menor valor: {np.min(val_funcao)}")
+            print(f"Menor valor: {np.min(val_funcao)}, Moda: {mode(val_funcao)}")
 
         avaliacao = np.array([sum(1 for y in val_funcao if y <= x) for x in val_funcao])
 
@@ -147,7 +163,7 @@ class AlgoritmoGenetico:
 
 
         indices = [i + (-1)**i for i in range(self.num_populacao)]
-        
+
         populacao1 = populacao[indices]
 
         indices_corte = [i - i % 2 for i in range(self.num_populacao)]
