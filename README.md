@@ -12,6 +12,7 @@ A classe `AlgoritmoGenetico` é usada para otimizar uma função específica por
 - o número de genes que representam cada variável;
 - o número de gerações;
 - as taxas de crossover e mutação;
+- peso dado na avaliação dos indivíduos;
 - parametros da função.
 
 ## Uso
