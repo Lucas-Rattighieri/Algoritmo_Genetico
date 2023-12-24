@@ -1,5 +1,3 @@
-import numpy as np
-
 class AlgoritmoGenetico:
     """
     Classe para implementação de um Algoritmo Genético para otimização de funções.
@@ -13,7 +11,9 @@ class AlgoritmoGenetico:
         num_geracoes (int): Número de gerações.
         taxa_crossover (float): Taxa de crossover.
         taxa_mutacao (float): Taxa de mutação.
+        peso_esolha (float): Peso dado a avaliação dos individuos de melhor aptidão.
         args (list, optional): Argumentos adicionais para a função a ser otimizada.
+        mostrar_iteracoes (bool, optional): Mostra a geracao e a aptidão do melhor individuo.
     """
 
     def __init__(self,
@@ -25,6 +25,7 @@ class AlgoritmoGenetico:
                 num_geracoes: int,
                 taxa_crossover: float,
                 taxa_mutacao: float,
+                peso_escolha: float = 0.5,
                 args: list = [],
                 mostrar_iteracoes = False
                 ):
@@ -37,6 +38,7 @@ class AlgoritmoGenetico:
         self.num_geracoes = num_geracoes
         self.taxa_crossover = taxa_crossover
         self.taxa_mutacao = taxa_mutacao
+        self.peso_escolha = peso_escolha
 
         self.mostrar_iteracoes = mostrar_iteracoes
 
@@ -114,7 +116,6 @@ class AlgoritmoGenetico:
 
 
     def _avaliar(self, populacao):
-        peso = 0.5
 
         val_funcao = self._aplicacao_funcao(populacao)
         
@@ -123,7 +124,7 @@ class AlgoritmoGenetico:
 
         avaliacao = np.array([sum(1 for y in val_funcao if y <= x) for x in val_funcao])
 
-        avaliacao = 1 / (avaliacao ** peso)
+        avaliacao = 1 / (avaliacao ** self.peso_escolha)
         avaliacao = avaliacao / np.sum(avaliacao)
 
         return avaliacao
@@ -144,6 +145,7 @@ class AlgoritmoGenetico:
 
 
         indices = [i + (-1)**i for i in range(self.num_populacao)]
+        print(indices)
         populacao1 = populacao[indices]
 
         indices_corte = [i - i % 2 for i in range(self.num_populacao)]
@@ -177,5 +179,3 @@ class AlgoritmoGenetico:
                                    replace=True)
 
         return populacao ^ pontos_mutacao
-
-
