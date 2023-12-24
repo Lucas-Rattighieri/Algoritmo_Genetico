@@ -103,7 +103,7 @@ class AlgoritmoGenetico:
 
         parametros = self._transformar_em_parametros(populacao)
 
-        val_funcao = np.apply_along_axis(self.funcao, 1, parametros)
+        val_funcao = np.apply_along_axis(self.funcao, 1, parametros, *self.args)
 
         return val_funcao
 
