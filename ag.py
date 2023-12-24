@@ -32,7 +32,7 @@ class AlgoritmoGenetico:
         self.funcao = funcao
         self.num_variaveis = num_variaveis
         self.args = args
-        self.num_populacao = num_populacao // 2
+        self.num_populacao = num_populacao - num_populacao % 2
         self.num_genes = num_genes
         self.num_geracoes = num_geracoes
         self.taxa_crossover = taxa_crossover
