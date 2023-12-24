@@ -13,7 +13,7 @@ class AlgoritmoGenetico:
         num_geracoes (int): Número de gerações.
         taxa_crossover (float): Taxa de crossover.
         taxa_mutacao (float): Taxa de mutação.
-        args (tuple, optional): Argumentos adicionais para a função a ser otimizada.
+        args (list, optional): Argumentos adicionais para a função a ser otimizada.
     """
 
     def __init__(self,
@@ -25,7 +25,7 @@ class AlgoritmoGenetico:
                 num_geracoes: int,
                 taxa_crossover: float,
                 taxa_mutacao: float,
-                args: tuple = ()
+                args: list = []
                 ):
 
         self.funcao = funcao
