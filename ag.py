@@ -15,6 +15,7 @@ class AlgoritmoGenetico:
         taxa_crossover (float): Taxa de crossover.
         taxa_mutacao (float): Taxa de mutação.
         peso_esolha (float): Peso dado a avaliação dos individuos de melhor aptidão.
+        x (list, optional): Variaveis para iniciar o algoritmo
         args (list, optional): Argumentos adicionais para a função a ser otimizada.
         mostrar_iteracoes (bool, optional): Mostra a geracao e a aptidão do melhor individuo.
     """
@@ -29,6 +30,7 @@ class AlgoritmoGenetico:
                 taxa_crossover: float,
                 taxa_mutacao: float,
                 peso_escolha: float = 0.5,
+                x: list = None,
                 args: list = [],
                 mostrar_iteracoes = False
                 ):
@@ -47,22 +49,30 @@ class AlgoritmoGenetico:
 
         self.xmin = np.array(xlim)[:, 0]
         self.xmax = np.array(xlim)[:, 1]
-        self.melhor_parametro = None
-        self.aptidao_melhor_parametro = None
+        self.x = x
+        self.aptidao_x = None
+        self.__bitstring_x = None
+
+        self._iniciar_x(x)
+
+        self.run()
 
 
     def run(self):
 
         populacao = self._iniciar_populacao()
 
-        avaliacao = self._avaliar(populacao)
+        t = 0
 
-        t = 1
+        val_funcao = self._aplicacao_funcao(populacao)
+
+        avaliacao = self._avaliar(populacao, val_funcao)
+
+        t += 1
 
         while (t <= self.num_geracoes):
-            
-            if (self.mostrar_iteracoes):
-                print(f"Geração {t}")
+
+            self._mostrar_iteracoes(populacao, t)
 
             populacao = self._selecionar(populacao, avaliacao)
 
@@ -70,25 +80,37 @@ class AlgoritmoGenetico:
 
             populacao = self._mutacao(populacao)
 
-            avaliacao = self._avaliar(populacao)
+            val_funcao = self._aplicacao_funcao(populacao)
+
+            avaliacao = self._avaliar(populacao, val_funcao)
 
 
             t += 1
 
-        parametros = self._transformar_em_parametros(populacao)
 
-        return parametros
 
+    def _iniciar_x(self, x):
+        if x is None:
+            pass
+        elif len(x) == self.num_variaveis:
+            self.x = np.array(x)
+            self.aptidao_x = self.funcao(self.x, *self.args)
+            self.__bitstring_x = self._to_bitstring(self.x)
+        else:
+            raise ValueError("Parametros iniciais não condizem com o número de variaveis.")
 
 
     def _to_bitstring(self, x):
 
-        num = (2 ** self.num_genes - 1) * (x - self.xmin) / (self.xmax - self.xmin)
-        return np.round(num)
+        xl = np.round((2 ** self.num_genes - 1) * (x - self.xmin) / (self.xmax - self.xmin), 0)
+
+        array_bitstring = np.array([[int(i) for i in np.binary_repr(int(num), self.num_genes)[::-1]] for num in xl])
+        
+        return array_bitstring
 
 
     def _to_real(self, individuo):
-        
+
         individuo = np.sum(individuo * 2 ** np.arange(self.num_genes-1, -1, -1), -1)
 
         x = self.xmin + individuo * (self.xmax - self.xmin) / (2 ** self.num_genes - 1)
@@ -117,29 +139,40 @@ class AlgoritmoGenetico:
 
         val_funcao = np.apply_along_axis(self.funcao, 1, parametros, *self.args)
 
-        self._atualizar_melhor_parametro(parametros, val_funcao)
+        self._inserir_x(populacao, val_funcao)
+        self._atualizar_x(parametros, val_funcao)
 
         return val_funcao
 
-    def _atualizar_melhor_parametro(self, parametros, val_funcao):
+
+    def _inserir_x(self, populacao, val_funcao):
+        if not self.x is None:
+            ind = np.argmax(val_funcao)
+            populacao[ind] = self.__bitstring_x
+            val_funcao[ind] = self.aptidao_x
+
+
+    def _atualizar_x(self, parametros, val_funcao):
         m_parametro = parametros[np.argmin(val_funcao)]
         aptidao = np.min(val_funcao)
 
-        if self.aptidao_melhor_parametro is None:
-            self.melhor_parametro = m_parametro
-            self.aptidao_melhor_parametro = aptidao
+        if self.aptidao_x is None:
+            self.x = m_parametro
+            self.aptidao_x = aptidao
 
-        elif self.aptidao_melhor_parametro > aptidao:
-            self.melhor_parametro = m_parametro
-            self.aptidao_melhor_parametro = aptidao
+        elif self.aptidao_x > aptidao:
+            self.x = m_parametro
+            self.aptidao_x = aptidao
 
 
-    def _avaliar(self, populacao):
-
-        val_funcao = self._aplicacao_funcao(populacao)
-        
+    def _mostrar_iteracoes(self, populacao, iteracao):
         if (self.mostrar_iteracoes):
-            print(f"Menor valor: {np.min(val_funcao)}, Moda: {mode(val_funcao)}")
+            val_funcao = self._aplicacao_funcao(populacao)
+            print(f"Geração {iteracao}")
+            print(f"Menor valor: {np.min(val_funcao)}, Moda: {mode(val_funcao)}")        
+
+
+    def _avaliar(self, populacao, val_funcao):
 
         avaliacao = np.array([sum(1 for y in val_funcao if y <= x) for x in val_funcao])
 
@@ -155,8 +188,6 @@ class AlgoritmoGenetico:
                          p=avaliacao,
                          replace=True)
 
-
-
         return populacao[indices]
 
 
@@ -169,22 +200,22 @@ class AlgoritmoGenetico:
 
         indices_corte = [i - i % 2 for i in range(self.num_populacao)]
 
-        pontos_corte = np.random.choice(2, 
-                                   size=(self.num_populacao, self.num_variaveis, 1), 
-                                   p=[1-self.taxa_crossover, self.taxa_crossover], 
+        pontos_corte = np.random.choice(2,
+                                   size=(self.num_populacao, self.num_variaveis, 1),
+                                   p=[1-self.taxa_crossover, self.taxa_crossover],
                                    replace=True
-                                   ) 
-        
-        pontos_corte = pontos_corte * np.random.randint(1, 
-                                              self.num_genes, 
+                                   )
+
+        pontos_corte = pontos_corte * np.random.randint(1,
+                                              self.num_genes,
                                               size=(self.num_populacao, self.num_variaveis, 1)
                                               )
         pontos_corte = pontos_corte[indices_corte]
 
-        mascara = np.tile(np.arange(self.num_genes).reshape(1, -1), 
-                            (self.num_populacao, self.num_variaveis, 1) 
+        mascara = np.tile(np.arange(self.num_genes).reshape(1, -1),
+                            (self.num_populacao, self.num_variaveis, 1)
                             ) < pontos_corte
-        
+
         populacao = (populacao & mascara) | (populacao1 & ~mascara)
 
         return populacao
