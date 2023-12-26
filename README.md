@@ -1,47 +1,50 @@
-# Algoritmo Genético 
+# Algoritmo Genético
 
-Este é um exemplo de implementação de um Algoritmo Genético em Python para otimização de funções.
+Este é um exemplo de implementação de um Algoritmo Genético em Python para a otimização de funções. O algoritmo é capaz de encontrar um conjunto de variáveis que minimiza uma função fornecida.
 
-## Descrição
+## Como usar
 
-A classe `AlgoritmoGenetico` é usada para otimizar uma função específica por meio de um Algoritmo Genético. Ela permite a configuração de parâmetros como:
-- a função a ser otimizada;
-- o número de variáveis;
-- os limites das variáveis;
-- o tamanho da população;
-- o número de genes que representam cada variável;
-- o número de gerações;
-- as taxas de crossover e mutação;
-- peso dado na avaliação dos indivíduos;
-- parametros da função.
+Para usar o Algoritmo Genético, siga estas etapas:
 
-## Uso
+1. Importe a classe `AlgoritmoGenetico` do módulo.
+2. Defina a função que você deseja otimizar.
+3. Crie uma instância da classe `AlgoritmoGenetico`, passando a função, o número de variáveis, os limites das variáveis, o tamanho da população, o número de genes, o número de gerações, as taxas de crossover e mutação, entre outros parâmetros opcionais. O método `run()` é automaticamente chamado para execução do algoritmo.
+4. Chame o atributo `x` da instancia criada para obter o conjuto de variáveis que minimiza a função.
 
-Para usar esta classe, siga os passos abaixo:
+## Parâmetros da Classe `AlgoritmoGenetico`
 
-1. Crie uma instância da classe `AlgoritmoGenetico`, passando os parâmetros necessários.
-2. Chame o método `run()` para executar o algoritmo e obter os parâmetros otimizados.
+- `funcao`: A função a ser otimizada.
+- `num_variaveis`: O número de variáveis da função.
+- `xlim`: Uma lista de tuplas com os limites inferior e superior das variáveis.
+- `num_populacao`: O tamanho da população.
+- `num_genes`: O número de genes (bits) que representam cada variável.
+- `num_geracoes`: O número de gerações.
+- `taxa_crossover`: A taxa de crossover.
+- `taxa_mutacao`: A taxa de mutação.
+- `peso_escolha`: Peso dado à avaliação dos indivíduos de melhor aptidão (opcional, padrão é 0.5).
+- `x`: Variáveis para iniciar o algoritmo (opcional).
+- `args`: Argumentos adicionais para a função a ser otimizada (opcional).
+- `mostrar_iteracoes`: Mostra a geração e a aptidão do melhor indivíduo (opcional, padrão é False).
 
-Exemplo de uso:
+## Exemplo de Uso
 
 ```python
-# Define a função a ser otimizada
-def funcao(x):
-    return x[0]**2 + x[1]**2  
+# Exemplo de uso do Algoritmo Genético
 
+def funcao_exemplo(x, *args):
+    return x[0]**2 + x[1]**2  # Função de exemplo (a ser substituída pela sua)
 
 algoritmo = AlgoritmoGenetico(
-    funcao=funcao,
+    funcao=funcao_exemplo,
     num_variaveis=2,
-    xlim=[(-10, 10), (-10, 10)], 
+    xlim=[(-5, 5), (-5, 5)],
     num_populacao=100,
     num_genes=10,
-    num_geracoes=50,
+    num_geracoes=100,
     taxa_crossover=0.8,
-    taxa_mutacao=0.1
+    taxa_mutacao=0.1,
+    mostrar_iteracoes=True
 )
 
-resultado = algoritmo.run()
-
-print("Parâmetros otimizados:", resultado)
+resultado = algoritmo.x
 ```
