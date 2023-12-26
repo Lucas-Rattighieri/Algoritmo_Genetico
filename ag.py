@@ -15,7 +15,7 @@ class AlgoritmoGenetico:
         taxa_crossover (float): Taxa de crossover.
         taxa_mutacao (float): Taxa de mutação.
         peso_esolha (float): Peso dado a avaliação dos individuos de melhor aptidão.
-        x (list, optional): Variaveis para iniciar o algoritmo
+        x (list, optional): Variaveis para iniciar o algoritmo.
         args (list, optional): Argumentos adicionais para a função a ser otimizada.
         mostrar_iteracoes (bool, optional): Mostra a geracao e a aptidão do melhor individuo.
     """
