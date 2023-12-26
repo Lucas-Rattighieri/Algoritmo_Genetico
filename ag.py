@@ -15,7 +15,7 @@ class AlgoritmoGenetico:
         taxa_crossover (float): Taxa de crossover.
         taxa_mutacao (float): Taxa de mutação.
         peso_esolha (float): Peso dado a avaliação dos individuos de melhor aptidão.
-        x (list, optional): Variaveis para iniciar o algoritmo.
+        x (list, optional): Variaveis para iniciar o algoritmo
         args (list, optional): Argumentos adicionais para a função a ser otimizada.
         mostrar_iteracoes (bool, optional): Mostra a geracao e a aptidão do melhor individuo.
     """
@@ -140,7 +140,7 @@ class AlgoritmoGenetico:
         val_funcao = np.apply_along_axis(self.funcao, 1, parametros, *self.args)
 
         self._inserir_x(populacao, val_funcao)
-        self._atualizar_x(parametros, val_funcao)
+        self._atualizar_x(populacao, parametros, val_funcao)
 
         return val_funcao
 
@@ -152,13 +152,16 @@ class AlgoritmoGenetico:
             val_funcao[ind] = self.aptidao_x
 
 
-    def _atualizar_x(self, parametros, val_funcao):
-        m_parametro = parametros[np.argmin(val_funcao)]
+    def _atualizar_x(self, populacao, parametros, val_funcao):
+        ind_min = np.argmin(val_funcao)
+        m_parametro = parametros[ind_min]
+        m_individuo = populacao[ind_min]
         aptidao = np.min(val_funcao)
 
         if self.aptidao_x is None:
             self.x = m_parametro
             self.aptidao_x = aptidao
+            self.__bitstring_x = m_individuo
 
         elif self.aptidao_x > aptidao:
             self.x = m_parametro
