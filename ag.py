@@ -126,6 +126,7 @@ class AlgoritmoGenetico:
 
 
     def _iniciar_populacao(self):
+        self.__geracoes_sem_melhora = 0
 
         populacao = np.random.randint(2,
                                     size=(self.num_populacao, self.num_variaveis, self.num_genes),
