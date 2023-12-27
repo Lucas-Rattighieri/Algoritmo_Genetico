@@ -17,6 +17,7 @@ class AlgoritmoGenetico:
         peso_esolha (float): Peso dado a avaliação dos individuos de melhor aptidão.
         x (list, optional): Variaveis para iniciar o algoritmo
         args (list, optional): Argumentos adicionais para a função a ser otimizada.
+        parada (int, optional): Número de gerações consecutivas em que não houve melhora na aptidão para parar o algoritmo.
         mostrar_iteracoes (bool, optional): Mostra a geracao e a aptidão do melhor individuo.
     """
 
@@ -32,6 +33,7 @@ class AlgoritmoGenetico:
                 peso_escolha: float = 0.5,
                 x: list = None,
                 args: list = [],
+                parada: int = None,
                 mostrar_iteracoes = False
                 ):
 
@@ -44,7 +46,7 @@ class AlgoritmoGenetico:
         self.taxa_crossover = taxa_crossover
         self.taxa_mutacao = taxa_mutacao
         self.peso_escolha = peso_escolha
-
+        self.parada = parada
         self.mostrar_iteracoes = mostrar_iteracoes
 
         self.xmin = np.array(xlim)[:, 0]
@@ -52,10 +54,14 @@ class AlgoritmoGenetico:
         self.x = x
         self.aptidao_x = None
         self.__bitstring_x = None
+        self.__geracoes_sem_melhora = 0
 
         self._iniciar_x(x)
 
+        
         self.run()
+
+    
 
 
     def run(self):
@@ -65,14 +71,15 @@ class AlgoritmoGenetico:
         t = 0
 
         val_funcao = self._aplicacao_funcao(populacao)
+        print('g', self.__geracoes_sem_melhora)
 
         avaliacao = self._avaliar(populacao, val_funcao)
 
         t += 1
 
-        while (t <= self.num_geracoes):
+        while (t <= self.num_geracoes and self._interromper_execussao()):
 
-            self._mostrar_iteracoes(populacao, t)
+            self._mostrar_iteracoes(val_funcao, t)
 
             populacao = self._selecionar(populacao, avaliacao)
 
@@ -82,11 +89,15 @@ class AlgoritmoGenetico:
 
             val_funcao = self._aplicacao_funcao(populacao)
 
-            avaliacao = self._avaliar(populacao, val_funcao)
+            self._inserir_e_atualizar_x(populacao, val_funcao)
 
+            avaliacao = self._avaliar(populacao, val_funcao)
 
             t += 1
 
+
+    def _interromper_execussao(self):
+        return not self.__geracoes_sem_melhora == self.parada
 
 
     def _iniciar_x(self, x):
@@ -139,9 +150,6 @@ class AlgoritmoGenetico:
 
         val_funcao = np.apply_along_axis(self.funcao, 1, parametros, *self.args)
 
-        self._inserir_x(populacao, val_funcao)
-        self._atualizar_x(populacao, parametros, val_funcao)
-
         return val_funcao
 
 
@@ -166,11 +174,20 @@ class AlgoritmoGenetico:
         elif self.aptidao_x > aptidao:
             self.x = m_parametro
             self.aptidao_x = aptidao
+            self.__bitstring_x = m_individuo
+            self.__geracoes_sem_melhora = 0
+        else:
+            self.__geracoes_sem_melhora += 1
 
 
-    def _mostrar_iteracoes(self, populacao, iteracao):
+    def _inserir_e_atualizar_x(self, populacao, val_funcao):
+        parametros = self._transformar_em_parametros(populacao)
+        self._inserir_x(populacao, val_funcao)
+        self._atualizar_x(populacao, parametros, val_funcao)
+
+
+    def _mostrar_iteracoes(self, val_funcao, iteracao):
         if (self.mostrar_iteracoes):
-            val_funcao = self._aplicacao_funcao(populacao)
             print(f"Geração {iteracao}")
             print(f"Menor valor: {np.min(val_funcao)}, Moda: {mode(val_funcao)}")        
 
