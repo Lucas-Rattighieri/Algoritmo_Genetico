@@ -70,6 +70,8 @@ class AlgoritmoGenetico:
 
         val_funcao = self._aplicacao_funcao(populacao)
 
+        self._inserir_e_atualizar_x(populacao, val_funcao)
+
         avaliacao = self._avaliar(populacao, val_funcao)
 
         t = 1
