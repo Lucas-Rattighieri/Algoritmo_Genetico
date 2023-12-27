@@ -68,14 +68,11 @@ class AlgoritmoGenetico:
 
         populacao = self._iniciar_populacao()
 
-        t = 0
-
         val_funcao = self._aplicacao_funcao(populacao)
-        print('g', self.__geracoes_sem_melhora)
 
         avaliacao = self._avaliar(populacao, val_funcao)
 
-        t += 1
+        t = 1
 
         while (t <= self.num_geracoes and self._interromper_execussao()):
 
