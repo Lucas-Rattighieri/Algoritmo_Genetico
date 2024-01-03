@@ -31,8 +31,8 @@ Para usar o Algoritmo Genético, siga estas etapas:
 ```python
 # Exemplo de uso do Algoritmo Genético
 
-def funcao_exemplo(x, *args):
-    return x[0]**2 + x[1]**2  # Função de exemplo (a ser substituída pela sua)
+def funcao_exemplo(x):
+    return x[0]**2 + x[1]**2  # Função de exemplo
 
 algoritmo = AlgoritmoGenetico(
     funcao=funcao_exemplo,
